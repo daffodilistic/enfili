@@ -1,7 +1,3 @@
-package com.r573.enfili.common.singleton;
-
-import java.util.Hashtable;
-
 /*
  * Enfili
  * Project hosted at https://github.com/ryanhosp/enfili/
@@ -20,44 +16,64 @@ import java.util.Hashtable;
  * limitations under the License.
  */
 
+package com.r573.enfili.common.singleton;
+
+import java.util.HashMap;
+
 /**
- * Manages Singletons for the entire app.
+ * All instances of the Singleton should be created during the application bootstrap.
+ * This is to minimize having to synchronize and having to check for an existing instance
+ * every time an operation is requested.
  * 
  * @author ryanho
  *
+ * @param <T>
  */
-public class SingletonManager {
-	private static SingletonManager instance;
-	
-	private Hashtable<String,ISingleton> instanceTable;
-	
-	public static SingletonManager getInstance(){
-		if(instance == null){
-			instance = new SingletonManager();
-		}
-		return instance;
-	}
+public class SingletonManager<T> {
+	private static final String DEFAULT_TAG = "default";
+
+	private HashMap<String,T> instances;
 	
 	public SingletonManager(){
-		instanceTable = new Hashtable<String, ISingleton>();
+		 instances = new HashMap<String,T>();
 	}
 	
-	public <T extends ISingleton>T getService(Class<T> serviceClass) {
-		@SuppressWarnings("unchecked")
-		T serviceInstance = (T) instanceTable.get(serviceClass.getName());
-		if(serviceInstance == null) {
-			try {
-				serviceInstance = serviceClass.newInstance();
-			}
-			catch (InstantiationException e) {
-				// Can only be caused by programming error. Throwing RuntimException.
-				throw new RuntimeException(e);
-			}
-			catch (IllegalAccessException e) {
-				// Can only be caused by programming error. Throwing RuntimException.
-				throw new RuntimeException(e);
-			}
-		}
-		return serviceInstance;
+	public void addInstance(String tag, T instance){
+    	if(tag == null) {
+    		tag = DEFAULT_TAG;
+    	}
+    	if(instances.containsKey(tag)){
+    		throw new IllegalStateException("Instance with tag " + tag + " already exists. Please remove before adding.");
+    	}
+    	instances.put(tag,instance);	
 	}
+	
+    public boolean removeInstance(String tag){
+    	T removedInstance = instances.remove(tag);
+    	if(removedInstance != null) {
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
+    }
+
+    public T getDefaultInstance(){
+    	T instance = instances.get(DEFAULT_TAG);
+    	if(instance == null){
+    		throw new IllegalStateException("Default instance not yet created.");
+    	}
+    	return instance;
+    }
+    public T getInstance(String tag) {
+    	T instance = instances.get(tag);
+    	if(instance == null){
+    		throw new IllegalArgumentException("Instance with tag " + tag + " does not exist.");
+    	}
+    	return instance;
+    }
+
+    public boolean hasInstance(String tag){
+    	return instances.containsKey(tag);
+    }
 }

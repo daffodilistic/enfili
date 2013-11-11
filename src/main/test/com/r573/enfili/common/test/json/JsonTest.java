@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.r573.enfili.common.json.JsonUtil;
+import com.r573.enfili.common.doc.json.JsonHelper;
 
 public class JsonTest {
 	@SuppressWarnings("unused")
@@ -28,17 +28,17 @@ public class JsonTest {
 	
 	@Test
 	public void toJson(){
-		String json = JsonUtil.toJson(TEST_OBJ);
+		String json = JsonHelper.toJson(TEST_OBJ);
 		Assert.assertEquals(TEST_JSON, json);
 	}
 	@Test
 	public void fromJson(){
-		Employee employee = JsonUtil.fromJson(TEST_JSON, Employee.class);
+		Employee employee = JsonHelper.fromJson(TEST_JSON, Employee.class);
 		Assert.assertEquals(TEST_OBJ, employee);
 	}
 	@Test
 	public void toMap(){
-		Map<String,Object> map = JsonUtil.convertToMap(TEST_OBJ);
+		Map<String,Object> map = JsonHelper.convertToMap(TEST_OBJ);
 		Assert.assertEquals(TEST_MAP, map);
 	}
 }
