@@ -39,7 +39,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
 
 	@Override
 	public Response toResponse(Exception e) {
-		
+		log.error("Exception " + e.getClass().getName() + " caught in GeneralExceptionMapper");
 		log.error(StringHelper.stackTraceToString(e));
 		GenericEntity<String> entity = new GenericEntity<String>(JsonHelper.toJson(new WsResponse<WsError>(WsResponse.RESP_CODE_ERROR, new WsError(WsError.GENERAL_ERROR, "General Error")))) {
 		};

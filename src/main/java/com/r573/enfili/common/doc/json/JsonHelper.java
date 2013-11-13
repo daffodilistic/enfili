@@ -21,12 +21,13 @@ package com.r573.enfili.common.doc.json;
 import java.io.IOException;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectWriter;
+import org.codehaus.jackson.type.JavaType;
+import org.codehaus.jackson.type.TypeReference;
 
 public class JsonHelper {
 
@@ -65,10 +66,16 @@ public class JsonHelper {
 		return jsonMapper.convertValue(obj, typeRef);
 	}
 	
-	public static String toJson(Object obj) {
-		ObjectMapper jsonMapper = new ObjectMapper();
+	public static String toJson(Object obj, boolean prettyPrint) {
 		try {
-			return jsonMapper.writeValueAsString(obj);
+			if(prettyPrint){
+				ObjectWriter jsonWriter = (new ObjectMapper()).writerWithDefaultPrettyPrinter();
+				return jsonWriter.writeValueAsString(obj);
+			}
+			else{
+				ObjectMapper jsonMapper = new ObjectMapper();
+				return jsonMapper.writeValueAsString(obj);
+			}
 		} catch (JsonMappingException e) {
 			throw new JsonProcessingException(e, obj);
 		} catch (JsonGenerationException e) {
@@ -77,5 +84,8 @@ public class JsonHelper {
 			// this is impossible. We are writing a string, not an InputStream.
 			throw new RuntimeException(e);
 		}
+	}
+	public static String toJson(Object obj) {
+		return toJson(obj, false);
 	}	
 }

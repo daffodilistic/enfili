@@ -15,20 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.r573.enfili.common.resource.external.appstore;
+package com.r573.enfili.ws.service;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class VerifyReceiptRequest {
-	
-	@JsonProperty("receipt-data")
-	private String receiptData;
-
-	public String getReceiptData() {
-		return receiptData;
-	}
-
-	public void setReceiptData(String receiptData) {
-		this.receiptData = receiptData;
-	}
+public abstract class BaseService {	
+	protected Logger log = LoggerFactory.getLogger(this.getClass());
 }

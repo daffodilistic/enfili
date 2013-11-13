@@ -15,20 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.r573.enfili.common.resource.external.appstore;
+package com.r573.enfili.common.resource.db.mongo;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.r573.enfili.common.exception.BaseRuntimeException;
 
-public class VerifyReceiptRequest {
-	
-	@JsonProperty("receipt-data")
-	private String receiptData;
+public class MongoRuntimeException extends BaseRuntimeException {
+	private static final long serialVersionUID = 1L;
 
-	public String getReceiptData() {
-		return receiptData;
-	}
-
-	public void setReceiptData(String receiptData) {
-		this.receiptData = receiptData;
+	public MongoRuntimeException(String errCode, String errDesc) {
+		super(errCode, errDesc);
 	}
 }

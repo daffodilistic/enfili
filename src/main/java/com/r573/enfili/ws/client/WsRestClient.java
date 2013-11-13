@@ -33,11 +33,11 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.r573.enfili.common.doc.json.JsonHelper;
 import com.r573.enfili.common.text.StringHelper;
 import com.r573.enfili.ws.data.WsResponse;

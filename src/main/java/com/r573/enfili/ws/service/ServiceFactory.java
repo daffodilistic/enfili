@@ -29,14 +29,14 @@ import com.r573.enfili.common.singleton.SingletonManager;
  *
  */
 public class ServiceFactory {
-	private static SingletonManager<AbstractService> singletonManager = new SingletonManager<AbstractService>();
+	private static SingletonManager<BaseService> singletonManager = new SingletonManager<BaseService>();
 	
-	public static void initWithServices(ArrayList<AbstractService> services){
-		for(AbstractService service : services) {
+	public static void initWithServices(ArrayList<BaseService> services){
+		for(BaseService service : services) {
 			singletonManager.addInstance(service.getClass().getName(), service);
 		}
 	}
-	public static <T extends AbstractService>T getService(Class<T> serviceClass) {
+	public static <T extends BaseService>T getService(Class<T> serviceClass) {
 		@SuppressWarnings("unchecked")
 		T serviceInstance = (T) singletonManager.getInstance(serviceClass.getName());
 		return serviceInstance;

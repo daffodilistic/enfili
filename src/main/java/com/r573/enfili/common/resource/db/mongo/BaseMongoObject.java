@@ -15,11 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.r573.enfili.ws.service;
+package com.r573.enfili.common.resource.db.mongo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bson.types.ObjectId;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.mongodb.morphia.annotations.Id;
 
-public abstract class AbstractService {	
-	protected Logger log = LoggerFactory.getLogger(this.getClass());
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class BaseMongoObject {
+	
+	@Id
+	@JsonIgnore
+	private ObjectId objectId;
+	private String id;
+	
+	public BaseMongoObject(){
+	}
+	
+	public ObjectId getObjectId() {
+		return objectId;
+	}
+	public void setObjectId(ObjectId objectId) {
+		this.objectId = objectId;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 }

@@ -1,0 +1,14 @@
+<project name="enfili" default="jar" basedir="." >
+	<property name="dist.dir" value="${basedir}/dist"/>
+	<property name="classes.dir" value="${basedir}/bin"/>
+	<property name="src.dir" value="${basedir}/src/main/java"/>
+	<property name="api.file" value="${dist.dir}/${ant.project.name}.jar"/>
+
+	<target name="init">
+		<delete file="${api.file}"/>		
+	</target>
+	
+	<target name="jar" depends="init">
+		<jar destfile="${api.file}" basedir="${classes.dir}" />
+	</target>	
+</project>
