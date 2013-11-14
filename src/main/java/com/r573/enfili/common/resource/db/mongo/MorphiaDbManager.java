@@ -26,11 +26,14 @@ import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 public class MorphiaDbManager {
+	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
 	public static final String ERR_DB_WRITE_FAILURE = "MD-001";
 	
 	private static MorphiaDbManager instance;
@@ -85,10 +88,12 @@ public class MorphiaDbManager {
 	/**
 	 * Handles partial updates
 	 */
-	public <T extends BaseMongoObject> void updateField(Class<T> clazz, Object keyObj, String fieldName, Object fieldData) {
-		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).add(fieldName, fieldData);
-		Key<T> key = new Key<T>(clazz,keyObj);
+	public <T extends BaseMongoObject> void updateField(Class<T> clazz, String id, String fieldName, Object fieldData) {
+		log.debug("updateField " + fieldName + " for type "+clazz.getName()+" id "+id+" with fieldData " + fieldData.toString());
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).set(fieldName, fieldData);
+		Key<T> key = new Key<T>(clazz,new ObjectId(id));
 		UpdateResults<T> results = ds.update(key, ops);
+		log.debug("UpdatedCount " + results.getUpdatedCount());
 		if(results.getHadError()){
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
 		}
