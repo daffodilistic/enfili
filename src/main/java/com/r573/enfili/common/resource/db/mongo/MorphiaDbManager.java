@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -71,35 +73,96 @@ public class MorphiaDbManager {
 		}
 	}
 	
-	public <T extends BaseMongoObject>T insert(T obj){
+	public Datastore getDataStore(){
+		return ds;
+	}
+	
+	public <T extends BaseMongoObject>T save(T obj){
 		ds.save(obj);
 		setId(obj);
 		return obj;
 	}
 	
 	public <T extends BaseMongoObject>T get(Class<T> clazz,String id){
-		Key<T> key = new Key<T>(clazz,new ObjectId((String)id));
-		T obj = ds.getByKey(clazz, key);
-//		T obj = ds.find(clazz,"_id",new ObjectId(id)).get();
+		T obj = ds.getByKey(clazz, makeKey(clazz, id));
 		setId(obj);
 		return obj;
 	}
 	
-	/**
-	 * Handles partial updates
-	 */
 	public <T extends BaseMongoObject> void updateField(Class<T> clazz, String id, String fieldName, Object fieldData) {
 		log.debug("updateField " + fieldName + " for type "+clazz.getName()+" id "+id+" with fieldData " + fieldData.toString());
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).set(fieldName, fieldData);
-		Key<T> key = new Key<T>(clazz,new ObjectId(id));
-		UpdateResults<T> results = ds.update(key, ops);
+		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
 		log.debug("UpdatedCount " + results.getUpdatedCount());
 		if(results.getHadError()){
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
 		}
 	}
 	
+	public <T extends BaseMongoObject> void deleteField(Class<T> clazz, String id, String fieldName) {
+		log.debug("deleteField " + fieldName + " for type "+clazz.getName()+" id "+id);
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).unset(fieldName);
+		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
+		log.debug("UpdatedCount " + results.getUpdatedCount());
+		if(results.getHadError()){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}		
+	}
+	
+	public <T extends BaseMongoObject> void addToArray(Class<T> clazz, String id, String fieldName, Object item) {
+		log.debug("addToArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with item " + item.toString());
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).add(fieldName, item);
+		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
+		log.debug("UpdatedCount " + results.getUpdatedCount());
+		if(results.getHadError()){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}
+	}
+	public <T extends BaseMongoObject> void removeFromArray(Class<T> clazz, String id, String fieldName, Object item) {
+		log.debug("removeFromArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with item " + item.toString());
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, item);
+		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
+		log.debug("UpdatedCount " + results.getUpdatedCount());
+		if(results.getHadError()){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}
+	}
+	public <T extends BaseMongoObject> void replaceItemInArray(Class<T> clazz, String id, String fieldName, Object oldItem, Object newItem) {
+		log.debug("replaceItemInArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with oldItem " + oldItem.toString() + " newItem " + newItem.toString());
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, oldItem).add(fieldName, newItem);
+		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
+		log.debug("UpdatedCount " + results.getUpdatedCount());
+		if(results.getHadError()){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}
+	}
+	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
+		Query<T> query = ds.find(clazz,queryField,queryValue);
+		List<T> queryResults = query.asList();
+		for (T obj : queryResults) {
+			setId(obj);			
+		}
+		
+		return queryResults;
+	}
+	public <T extends BaseMongoObject> void delete(Class<T> clazz, String id) {
+		BaseMongoObject obj;
+		try {
+			obj = clazz.newInstance();
+			obj.setObjectId(new ObjectId(id));
+			ds.delete(obj);
+		} catch (InstantiationException e) {
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, "Error instantiating object for class " + clazz.getName());
+		} catch (IllegalAccessException e) {
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, "Error instantiating object for class " + clazz.getName());
+		}
+	}
 	private <T extends BaseMongoObject> void setId(T obj){
 		obj.setId(obj.getObjectId().toString());
+	}
+	
+	private <T extends BaseMongoObject> Key<T> makeKey(Class<T> clazz, String id) {
+		Key<T> key = new Key<T>(clazz,new ObjectId(id));
+		return key;
 	}
 }
