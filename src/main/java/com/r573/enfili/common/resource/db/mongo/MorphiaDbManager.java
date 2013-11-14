@@ -20,8 +20,12 @@ package com.r573.enfili.common.resource.db.mongo;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -66,7 +70,31 @@ public class MorphiaDbManager {
 	
 	public <T extends BaseMongoObject>T insert(T obj){
 		ds.save(obj);
-		obj.setId(obj.getObjectId().toString());
+		setId(obj);
 		return obj;
+	}
+	
+	public <T extends BaseMongoObject>T get(Class<T> clazz,String id){
+		Key<T> key = new Key<T>(clazz,new ObjectId((String)id));
+		T obj = ds.getByKey(clazz, key);
+//		T obj = ds.find(clazz,"_id",new ObjectId(id)).get();
+		setId(obj);
+		return obj;
+	}
+	
+	/**
+	 * Handles partial updates
+	 */
+	public <T extends BaseMongoObject> void updateField(Class<T> clazz, Object keyObj, String fieldName, Object fieldData) {
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).add(fieldName, fieldData);
+		Key<T> key = new Key<T>(clazz,keyObj);
+		UpdateResults<T> results = ds.update(key, ops);
+		if(results.getHadError()){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}
+	}
+	
+	private <T extends BaseMongoObject> void setId(T obj){
+		obj.setId(obj.getObjectId().toString());
 	}
 }
