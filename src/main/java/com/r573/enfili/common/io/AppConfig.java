@@ -21,6 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Loads a config file from the classpath (e.g. file in src/main/resources compiled into the JAR under the Maven directly structure)
+ * To load from the root of the classpath, remember to prepend paths with "/"
+ * Used as Singleton
+ * 
+ * @author ryanho
+ *
+ */
 public class AppConfig {
 	private static final String CONFIG_FILE_PATH = "/config.properties";
 
@@ -53,6 +61,9 @@ public class AppConfig {
 		return instance;
 	}
 	
+	/**
+	 * Initializes AppConfig using the default config path "/config.properties"
+	 */
 	public static void init(){
 		init(CONFIG_FILE_PATH);
 	}
