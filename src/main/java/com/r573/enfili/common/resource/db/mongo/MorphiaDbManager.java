@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -137,6 +136,7 @@ public class MorphiaDbManager {
 		}
 	}
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
+		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
 		List<T> queryResults = query.asList();
 		for (T obj : queryResults) {
@@ -144,6 +144,15 @@ public class MorphiaDbManager {
 		}
 		
 		return queryResults;
+	}
+	public <T extends BaseMongoObject> T findOne(Class<T> clazz,String queryField, String queryValue){
+		List<T> queryResults = find(clazz,queryField,queryValue);
+		if((queryResults != null) && (queryResults.size()>0)){
+			return queryResults.get(0);
+		}
+		else{
+			return null;
+		}
 	}
 	public <T extends BaseMongoObject> void delete(Class<T> clazz, String id) {
 		BaseMongoObject obj;
