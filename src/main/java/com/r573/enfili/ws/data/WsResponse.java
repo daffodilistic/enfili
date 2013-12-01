@@ -17,10 +17,6 @@
  */
 package com.r573.enfili.ws.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 // Notes: javax.ws.rs.core.Response, ClientResponse has status.
@@ -31,20 +27,14 @@ public class WsResponse<T> {
 	public static final String RESP_CODE_ERROR = "ERR";
 	
 	private String statusCode;
-	private List<T> responseDataArray;
+	private T responseData;
 	
 	public WsResponse() {
 	}
 	
 	public WsResponse(String statusCode, T responseData) {
 		this.statusCode = statusCode;
-		this.responseDataArray = new ArrayList<T>();
-		responseDataArray.add(responseData);
-	}
-
-	public WsResponse(String statusCode, List<T> responseDataArray) {
-		this.statusCode = statusCode;
-		this.responseDataArray = responseDataArray;
+		this.responseData = responseData;
 	}
 	
 	public String getStatusCode() {
@@ -55,17 +45,7 @@ public class WsResponse<T> {
 		this.statusCode = statusCode;
 	}
 
-	@JsonIgnore
 	public T getResponseData() {
-		if((responseDataArray != null) && (!responseDataArray.isEmpty())){
-			return responseDataArray.get(0);
-		}
-		else {
-			return null;
-		}
+		return responseData;
 	}
-
-	public List<T> getResponseDataArray() {
-		return responseDataArray;
-	}	
 }
