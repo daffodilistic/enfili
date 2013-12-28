@@ -135,6 +135,29 @@ public class MorphiaDbManager {
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
 		}
 	}
+	
+	public <T extends BaseMongoObject,V extends BaseMongoObject> void mergeIntoArray(Class<T> clazz, String id, String fieldName, List<V> originalArray, List<V> mergeArray) {
+		for (V mergeItem : mergeArray) {
+			if(mergeItem.getId() == null){
+				mergeItem.setId(generateObjectIdString());
+				originalArray.add(mergeItem);
+			}
+			else{
+				int index = -1;
+				for (int i=0; i<originalArray.size(); i++) {
+					if(mergeItem.getId().equals(originalArray.get(i).getId())){
+						index = i;
+						break;
+					}
+				}
+				if(index != -1){
+					originalArray.set(index, mergeItem);
+				}
+			}
+		}
+		updateField(clazz, id, fieldName, originalArray);
+	}
+	
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
 		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
@@ -173,5 +196,13 @@ public class MorphiaDbManager {
 	private <T extends BaseMongoObject> Key<T> makeKey(Class<T> clazz, String id) {
 		Key<T> key = new Key<T>(clazz,new ObjectId(id));
 		return key;
+	}
+	
+	/**
+	 * Generate an Object ID (String only, to be used when the full BSON ID is not needed) 
+	 * @return
+	 */
+	public static String generateObjectIdString(){
+		return (new ObjectId()).toString();
 	}
 }
