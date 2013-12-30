@@ -128,11 +128,19 @@ public class MorphiaDbManager {
 	}
 	public <T extends BaseMongoObject> void replaceItemInArray(Class<T> clazz, String id, String fieldName, Object oldItem, Object newItem) {
 		log.debug("replaceItemInArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with oldItem " + oldItem.toString() + " newItem " + newItem.toString());
-		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, oldItem).add(fieldName, newItem);
+		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, oldItem);
 		UpdateResults<T> results = ds.update(makeKey(clazz, id), ops);
 		log.debug("UpdatedCount " + results.getUpdatedCount());
 		if(results.getHadError()){
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
+		}
+		else{
+			UpdateOperations<T> ops2 = ds.createUpdateOperations(clazz).add(fieldName, newItem);
+			UpdateResults<T> results2 = ds.update(makeKey(clazz, id), ops2);
+			log.debug("UpdatedCount " + results2.getUpdatedCount());
+			if(results2.getHadError()){
+				throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results2.getError());
+			}
 		}
 	}
 	
