@@ -54,6 +54,9 @@ public class AppConfig {
 	public long getConfigAsLong(String key) {
 		return Long.parseLong(config.getProperty(key));
 	}
+	public boolean getConfigAsBoolean(String key) {
+		return Boolean.parseBoolean(config.getProperty(key));
+	}
 	public static AppConfig getInstance() {
 		if(instance == null) {
 			throw new IllegalStateException("AppConfig needs to be initialized before use by calling one of the init methods");
