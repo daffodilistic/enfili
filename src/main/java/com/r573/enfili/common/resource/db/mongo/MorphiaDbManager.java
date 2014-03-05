@@ -19,6 +19,7 @@ package com.r573.enfili.common.resource.db.mongo;
 
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
@@ -178,6 +179,25 @@ public class MorphiaDbManager {
 	}
 	public <T extends BaseMongoObject> T findOne(Class<T> clazz,String queryField, String queryValue){
 		List<T> queryResults = find(clazz,queryField,queryValue);
+		if((queryResults != null) && (queryResults.size()>0)){
+			return queryResults.get(0);
+		}
+		else{
+			return null;
+		}
+	}
+	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField,Pattern regex){
+		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " regex " + regex.pattern());
+		Query<T> query = ds.find(clazz,queryField,regex);
+		List<T> queryResults = query.asList();
+		for (T obj : queryResults) {
+			setId(obj);			
+		}
+		
+		return queryResults;
+	}
+	public <T extends BaseMongoObject> T findOne(Class<T> clazz,String queryField,Pattern regex){
+		List<T> queryResults = find(clazz,queryField,regex);
 		if((queryResults != null) && (queryResults.size()>0)){
 			return queryResults.get(0);
 		}
