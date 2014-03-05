@@ -17,7 +17,8 @@
  */
 package com.r573.enfili.ws.service;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import com.r573.enfili.common.singleton.SingletonManager;
 
@@ -31,14 +32,21 @@ import com.r573.enfili.common.singleton.SingletonManager;
 public class ServiceFactory {
 	private static SingletonManager<BaseService> singletonManager = new SingletonManager<BaseService>();
 	
-	public static void initWithServices(ArrayList<BaseService> services){
+	public static void initWithServices(List<BaseService> services){
 		for(BaseService service : services) {
 			singletonManager.addInstance(service.getClass().getName(), service);
+			service.start();
 		}
 	}
 	public static <T extends BaseService>T getService(Class<T> serviceClass) {
 		@SuppressWarnings("unchecked")
 		T serviceInstance = (T) singletonManager.getInstance(serviceClass.getName());
 		return serviceInstance;
+	}
+	public static void stopAllServices(){
+		Collection<BaseService> services = singletonManager.getAllInstances();
+		for(BaseService service : services) {
+			service.stop();
+		}
 	}
 }

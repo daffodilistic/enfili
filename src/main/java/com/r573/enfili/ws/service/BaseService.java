@@ -22,4 +22,17 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BaseService {	
 	protected Logger log = LoggerFactory.getLogger(this.getClass());
+	
+	/**
+	 * Start the service. This is optional. Override where necessary.
+	 * Framework should always call this when app is starting.
+	 */
+	public void start(){
+	}
+	/**
+	 * Stop the service. This is optional. Override where necessary.
+	 * Framework should always call this when app is stopping.
+	 */
+	public void stop(){
+	}
 }

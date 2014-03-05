@@ -18,6 +18,7 @@
 
 package com.r573.enfili.common.singleton;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -76,4 +77,9 @@ public class SingletonManager<T> {
     public boolean hasInstance(String tag){
     	return instances.containsKey(tag);
     }
+
+	public Collection<T> getAllInstances() {
+		Collection<T> instanceList = instances.values();
+		return instanceList;
+	}
 }
