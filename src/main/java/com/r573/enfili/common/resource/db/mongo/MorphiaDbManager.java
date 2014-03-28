@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -215,6 +216,14 @@ public class MorphiaDbManager {
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, "Error instantiating object for class " + clazz.getName());
 		} catch (IllegalAccessException e) {
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, "Error instantiating object for class " + clazz.getName());
+		}
+	}
+	public <T extends BaseMongoObject> void findAndDelete(Class<T> clazz, String queryField, String queryValue) {
+		log.debug("findAndDelete for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
+		Query<T> query = ds.find(clazz,queryField,queryValue);
+		WriteResult result = ds.delete(query);
+		if(result.getError() != null){
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, result.getError());
 		}
 	}
 	private <T extends BaseMongoObject> void setId(T obj){
