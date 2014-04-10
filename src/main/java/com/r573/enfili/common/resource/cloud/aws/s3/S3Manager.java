@@ -47,6 +47,7 @@ public class S3Manager {
 	
     private RestS3Service s3Client;
     private String downloadDir;
+    private String pathSeparator;
     
     public static void initFromEnv(String downloadDir, String tag){
     	initFromEnv(AwsConstants.DEFAULT_ENV_KEY_ACCESS_KEY,AwsConstants.DEFAULT_ENV_KEY_SECRET_KEY,downloadDir, tag);
@@ -87,6 +88,7 @@ public class S3Manager {
         try {
             this.downloadDir = downloadDir;
             s3Client = new RestS3Service(awsCredentials);
+            pathSeparator = System.getProperty("file.separator");
         }
         catch (ServiceException e) {
             // fatal if S3 Client can't be created
@@ -125,7 +127,7 @@ public class S3Manager {
     	ArrayList<String> validFileNames = new ArrayList<String>();
         for(int i=0; i< s3Objects.length; i++){
         	String objectName = s3Objects[i].getName();
-        	if(!objectName.endsWith("/")) {
+        	if(!objectName.endsWith(pathSeparator)) {
         		validFileNames.add(objectName);
         	}
         }
@@ -172,11 +174,11 @@ public class S3Manager {
         try {
             S3Object downloadedObject = s3Client.getObject(bucketName, objectKey);
             InputStream downloadInputStream = downloadedObject.getDataInputStream();
-            File downloadedFile = new File(downloadDir + "/" + objectKey);
+            File downloadedFile = new File(downloadDir + pathSeparator + objectKey);
             
             // ensure directories are created before saving the file
             String filePath = downloadedFile.getPath();
-            String parentDirPath = filePath.substring(0, filePath.lastIndexOf("/"));
+            String parentDirPath = filePath.substring(0, filePath.lastIndexOf(pathSeparator));
             File parentDir = new File(parentDirPath);
             if(!parentDir.exists()) {
             	parentDir.mkdirs();
