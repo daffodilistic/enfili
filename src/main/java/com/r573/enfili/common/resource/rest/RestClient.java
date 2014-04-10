@@ -54,11 +54,17 @@ public class RestClient {
 		this.baseUrl = baseUrl;
 	}
 
-	private WebResource.Builder getResource(String path) {
+	private WebResource.Builder getResource(String path, Map<String,String> queryParams) {
 		String resourcePath = FileHelper.combinePath(baseUrl,path);
 		log.debug("Creating resource path: " + resourcePath);
-		WebResource.Builder builder = jerseyClient.resource(resourcePath).type(MediaType.APPLICATION_JSON_TYPE)
-				.accept(MediaType.APPLICATION_JSON_TYPE);
+		
+		WebResource webResource = jerseyClient.resource(resourcePath);
+		
+		for(String key : queryParams.keySet()){
+			webResource = webResource.queryParam(key, queryParams.get(key));
+		}
+		
+		WebResource.Builder builder = webResource.type(MediaType.APPLICATION_JSON_TYPE).accept(MediaType.APPLICATION_JSON_TYPE);;
 		Set<String> cookieNames = cookies.keySet();
 		for (String cookieName : cookieNames) {
 			builder = builder.cookie(cookies.get(cookieName));
@@ -66,26 +72,29 @@ public class RestClient {
 		return builder;
 	}
 
-	public <T> ResponseWrapper<T> get(String path, Class<T> clazz) {
-		ClientResponse response = getResource(path).get(ClientResponse.class);
+	public <T> ResponseWrapper<T> get(String path, Class<T> clazz, Map<String,String> queryParams) {
+		ClientResponse response = getResource(path,queryParams).get(ClientResponse.class);
 		return processResponse(response, clazz);
+	}
+	public <T> ResponseWrapper<T> get(String path, Class<T> clazz) {
+		return get(path,clazz,new HashMap<String,String>());
 	}
 
 	public <T> ResponseWrapper<T> post(String path, Object postObj, Class<T> clazz) {
 		String postObjJson = JsonHelper.toJson(postObj);
-		ClientResponse response = getResource(path).post(ClientResponse.class, postObjJson);
+		ClientResponse response = getResource(path,new HashMap<String,String>()).post(ClientResponse.class, postObjJson);
 		log.debug("status=" + response.getStatus());
 		return processResponse(response, clazz);
 	}
 
 	public <T> ResponseWrapper<T> put(String path, Object postObj, Class<T> clazz) {
 		String postObjJson = JsonHelper.toJson(postObj);
-		ClientResponse response = getResource(path).put(ClientResponse.class, postObjJson);
+		ClientResponse response = getResource(path,new HashMap<String,String>()).put(ClientResponse.class, postObjJson);
 		return processResponse(response, clazz);
 	}
 
 	public <T> ResponseWrapper<T> delete(String path, Class<T> clazz) {
-		ClientResponse response = getResource(path).delete(ClientResponse.class);
+		ClientResponse response = getResource(path,new HashMap<String,String>()).delete(ClientResponse.class);
 		return processResponse(response, clazz);
 	}
 	

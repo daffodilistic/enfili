@@ -17,8 +17,10 @@
  */
 package com.r573.enfili.common.cache.simple;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -76,16 +78,18 @@ public class SimpleInMemoryCache<T> implements Runnable {
 	
 	private synchronized void cleanup(){
 		log.debug("Cache cleanup");
-		int count = 0;
+		List<String> removeList = new ArrayList<String>();
 		Set<String> keys = cache.keySet();
 		for(String key : keys){
 			CacheItem<T> item = cache.get(key);
 			if(item.hasExpired()){
-				cache.remove(key);
-				count++;
-				log.debug("Removed " + count + " expired entries from cache");
+				removeList.add(key);
 			}
 		}
+		for(String removeKey : removeList){
+			cache.remove(removeKey);
+		}
+		log.debug("Removed " + removeList.size() + " expired entries from cache");
 	}
 	
 	public void stop(){
