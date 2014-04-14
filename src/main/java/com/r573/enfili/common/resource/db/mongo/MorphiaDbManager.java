@@ -171,12 +171,24 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
 		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
+		return find(query);
+	}
+	public <T extends BaseMongoObject> List<T> find(Query<T> query){
 		List<T> queryResults = query.asList();
 		for (T obj : queryResults) {
-			setId(obj);			
+			setId(obj);
 		}
 		
 		return queryResults;
+	}
+	public <T extends BaseMongoObject> T findOne(Query<T> query){
+		List<T> queryResults = find(query);
+		if((queryResults != null) && (queryResults.size()>0)){
+			return queryResults.get(0);
+		}
+		else{
+			return null;
+		}		
 	}
 	public <T extends BaseMongoObject> T findOne(Class<T> clazz,String queryField, String queryValue){
 		List<T> queryResults = find(clazz,queryField,queryValue);
