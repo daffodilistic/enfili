@@ -167,7 +167,21 @@ public class MorphiaDbManager {
 		}
 		updateField(clazz, id, fieldName, originalArray);
 	}
-	
+	public <T extends BaseMongoObject> List<T> findAndRetrieveField(Class<T> clazz,String queryField, String queryValue, String field){
+		log.debug("findAndRetrieveField for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue + " retrieve field " + field);
+		Query<T> query = ds.find(clazz,queryField,queryValue).retrievedFields(true, field);
+		return find(query);
+	}
+	public <T extends BaseMongoObject> T findOneAndRetrieveField(Class<T> clazz,String queryField, String queryValue, String field){
+		log.debug("findAndRetrieveField for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue + " retrieve field " + field);
+		Query<T> query = ds.find(clazz,queryField,queryValue).retrievedFields(true, field);
+		return findOne(query);
+	}
+	public <T extends BaseMongoObject> T getAndRetrieveField(Class<T> clazz,String id, String field){
+		log.debug("getAndRetrieveField for type "+clazz.getName()+" id " + id + " retrieve field " + field);
+		Query<T> query = ds.find(clazz,"_id",new ObjectId(id)).retrievedFields(true, field);
+		return findOne(query);
+	}
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
 		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
