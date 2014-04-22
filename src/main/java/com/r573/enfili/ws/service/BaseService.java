@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class BaseService {	
-	protected Logger log = LoggerFactory.getLogger(this.getClass());
+	@SuppressWarnings("unused")
+	private static Logger log = LoggerFactory.getLogger(BaseService.class);
 	
 	/**
 	 * Start the service. This is optional. Override where necessary.
