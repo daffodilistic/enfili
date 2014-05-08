@@ -18,6 +18,7 @@
 package com.r573.enfili.common.resource.db.mongo;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -180,6 +181,11 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> T getAndRetrieveField(Class<T> clazz,String id, String field){
 		log.debug("getAndRetrieveField for type "+clazz.getName()+" id " + id + " retrieve field " + field);
 		Query<T> query = ds.find(clazz,"_id",new ObjectId(id)).retrievedFields(true, field);
+		return findOne(query);
+	}
+	public <T extends BaseMongoObject> T getAndRetrieveFields(Class<T> clazz,String id, ArrayList<String> fieldList){
+		log.debug("getAndRetrieveField for type "+clazz.getName()+" id " + id + " retrieve fieldList size " + fieldList.size());
+		Query<T> query = ds.find(clazz,"_id",new ObjectId(id)).retrievedFields(true, fieldList.toArray(new String[fieldList.size()]));
 		return findOne(query);
 	}
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField, String queryValue){
