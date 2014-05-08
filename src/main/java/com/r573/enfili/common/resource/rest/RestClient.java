@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.r573.enfili.common.doc.json.JsonHelper;
-import com.r573.enfili.common.io.file.FileHelper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -51,11 +50,14 @@ public class RestClient {
 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 		jerseyClient = Client.create(clientConfig);
 		cookies = new HashMap<String, Cookie>();
+		if(!baseUrl.endsWith("/")){
+			baseUrl = baseUrl + "/";
+		}
 		this.baseUrl = baseUrl;
 	}
 
 	private WebResource.Builder getResource(String path, Map<String,String> queryParams) {
-		String resourcePath = FileHelper.combinePath(baseUrl,path);
+		String resourcePath = baseUrl+path;
 		log.debug("Creating resource path: " + resourcePath);
 		
 		WebResource webResource = jerseyClient.resource(resourcePath);
