@@ -118,7 +118,7 @@ public class WsRestClient {
 		}
 
 		String wsResponseJson = response.getEntity(String.class);
-		System.out.println(wsResponseJson);
+		log.debug(wsResponseJson);
 
 		WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
 		return wsResponse;
@@ -126,7 +126,7 @@ public class WsRestClient {
 
 	public File postAndDownloadFile(String path, Object postObj, File downloadDir, ArrayList<String> acceptTypes) {
 		String postObjJson = JsonHelper.toJson(postObj);
-		System.out.println("POST JSON " + postObjJson);
+		log.debug("POST JSON " + postObjJson);
 		
 		WebResource.Builder builder = jerseyClient.resource(baseUrl + path).type(MediaType.APPLICATION_JSON_TYPE);
 		builder = addAcceptTypes(builder, acceptTypes);
