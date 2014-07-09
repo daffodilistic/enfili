@@ -222,13 +222,24 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> List<T> find(Class<T> clazz,String queryField,Pattern regex){
 		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " regex " + regex.pattern());
 		Query<T> query = ds.find(clazz,queryField,regex);
-		List<T> queryResults = query.asList();
-		for (T obj : queryResults) {
-			setId(obj);			
-		}
-		
-		return queryResults;
+		return find(query);
 	}
+	public <T extends BaseMongoObject> List<T> findAll(Class<T> clazz){
+		log.debug("findAll for type "+clazz.getName());
+		Query<T> query = ds.find(clazz);
+		return find(query);
+	}	
+	public <T extends BaseMongoObject> List<T> findAllAndRetrieveField(Class<T> clazz, String field){
+		log.debug("findAll for type "+clazz.getName() + " retrieve field " + field);
+		Query<T> query = ds.find(clazz).retrievedFields(true, field);
+		return find(query);
+	}
+	public <T extends BaseMongoObject> List<T> findAllAndRetrieveFields(Class<T> clazz, ArrayList<String> fieldList){
+		log.debug("findAll for type "+clazz.getName() + " retrieve fieldList size " + fieldList.size());
+		Query<T> query = ds.find(clazz).retrievedFields(true, fieldList.toArray(new String[fieldList.size()]));
+		return find(query);
+	}
+	
 	public <T extends BaseMongoObject> T findOne(Class<T> clazz,String queryField,Pattern regex){
 		List<T> queryResults = find(clazz,queryField,regex);
 		if((queryResults != null) && (queryResults.size()>0)){
