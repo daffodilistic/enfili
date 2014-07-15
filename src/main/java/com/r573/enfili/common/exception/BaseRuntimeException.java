@@ -10,6 +10,9 @@ public class BaseRuntimeException extends RuntimeException{
 		this.errCode = errCode;
 		this.errDesc = errDesc;
 	}
+	public BaseRuntimeException(String errCode) {
+		this.errCode = errCode;
+	}
 
 	public String getErrCode() {
 		return errCode;
