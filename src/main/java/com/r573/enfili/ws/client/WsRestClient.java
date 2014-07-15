@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.r573.enfili.common.doc.json.JsonHelper;
 import com.r573.enfili.common.text.StringHelper;
+import com.r573.enfili.ws.data.WsError;
 import com.r573.enfili.ws.data.WsResponse;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -75,33 +76,33 @@ public class WsRestClient {
 		return builder;
 	}
 
-	public <T> WsResponse<T> get(String path, Class<T> clazz, Map<String,String> queryParams) {
+	public <T> WsResponse<T> get(String path, Class<T> clazz, Map<String,String> queryParams) throws WsRestException {
 		ClientResponse response = getResource(path,queryParams).get(ClientResponse.class);
 		return processResponse(response, clazz);
 	}
-	public <T> WsResponse<T> get(String path, Class<T> clazz) {
+	public <T> WsResponse<T> get(String path, Class<T> clazz) throws WsRestException {
 		return get(path,clazz,new HashMap<String, String>());
 	}
 
-	public <T> WsResponse<T> post(String path, Object postObj, Class<T> clazz) {
+	public <T> WsResponse<T> post(String path, Object postObj, Class<T> clazz) throws WsRestException {
 		String postObjJson = JsonHelper.toJson(postObj);
 		ClientResponse response = getResource(path,new HashMap<String, String>()).post(ClientResponse.class, postObjJson);
 		log.debug("status=" + response.getStatus());
 		return processResponse(response, clazz);
 	}
 
-	public <T> WsResponse<T> put(String path, Object postObj, Class<T> clazz) {
+	public <T> WsResponse<T> put(String path, Object postObj, Class<T> clazz) throws WsRestException {
 		String postObjJson = JsonHelper.toJson(postObj);
 		ClientResponse response = getResource(path,new HashMap<String, String>()).put(ClientResponse.class, postObjJson);
 		return processResponse(response, clazz);
 	}
 
-	public <T> WsResponse<T> delete(String path, Class<T> clazz) {
+	public <T> WsResponse<T> delete(String path, Class<T> clazz) throws WsRestException {
 		ClientResponse response = getResource(path,new HashMap<String, String>()).delete(ClientResponse.class);
 		return processResponse(response, clazz);
 	}
 	
-	private <T> WsResponse<T> processResponse(ClientResponse response, Class<T> clazz) {
+	private <T> WsResponse<T> processResponse(ClientResponse response, Class<T> clazz) throws WsRestException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		JavaType javaType = null;
@@ -120,8 +121,18 @@ public class WsRestClient {
 		String wsResponseJson = response.getEntity(String.class);
 		log.debug(wsResponseJson);
 
-		WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
-		return wsResponse;
+		JavaType mapType = objectMapper.getTypeFactory().constructParametricType(WsResponse.class, Map.class);
+		@SuppressWarnings("rawtypes")
+		WsResponse<Map> mapResp = JsonHelper.fromJson(wsResponseJson, mapType);
+		if(WsResponse.RESP_CODE_ERROR.equals(mapResp.getStatusCode())){
+			JavaType errorType = objectMapper.getTypeFactory().constructParametricType(WsResponse.class, WsError.class);
+			WsResponse<WsError> error = JsonHelper.fromJson(wsResponseJson, errorType);
+			throw new WsRestException(error.getResponseData());
+		}
+		else{
+			WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
+			return wsResponse;	
+		}
 	}
 
 	public File postAndDownloadFile(String path, Object postObj, File downloadDir, ArrayList<String> acceptTypes) {

@@ -1,8 +1,8 @@
 package com.r573.enfili.common.exception;
 
-@SuppressWarnings("serial")
 public class BaseRuntimeException extends RuntimeException{
-
+	private static final long serialVersionUID = 1L;
+	
 	private String errCode;
 	private String errDesc;
 	
@@ -25,5 +25,10 @@ public class BaseRuntimeException extends RuntimeException{
 
 	public void setErrDesc(String errDesc) {
 		this.errDesc = errDesc;
+	}
+	
+	@Override
+	public String getMessage(){
+		return errDesc + "("+errCode + ")";
 	}
 }
