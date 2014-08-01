@@ -33,12 +33,17 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.r573.enfili.common.doc.json.JsonHelper;
+import com.r573.enfili.common.exception.BaseRuntimeException;
 import com.r573.enfili.common.text.StringHelper;
 import com.r573.enfili.ws.data.WsError;
 import com.r573.enfili.ws.data.WsResponse;
@@ -120,18 +125,26 @@ public class WsRestClient {
 
 		String wsResponseJson = response.getEntity(String.class);
 		log.debug(wsResponseJson);
-
-		JavaType mapType = objectMapper.getTypeFactory().constructParametricType(WsResponse.class, Map.class);
-		@SuppressWarnings("rawtypes")
-		WsResponse<Map> mapResp = JsonHelper.fromJson(wsResponseJson, mapType);
-		if(WsResponse.RESP_CODE_ERROR.equals(mapResp.getStatusCode())){
-			JavaType errorType = objectMapper.getTypeFactory().constructParametricType(WsResponse.class, WsError.class);
-			WsResponse<WsError> error = JsonHelper.fromJson(wsResponseJson, errorType);
-			throw new WsRestException(error.getResponseData());
-		}
-		else{
-			WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
-			return wsResponse;	
+		
+		try {
+			JsonFactory factory = objectMapper.getJsonFactory();
+			JsonParser jp = factory.createJsonParser(wsResponseJson);
+			JsonNode node = objectMapper.readTree(jp);
+			JsonNode statusNode = node.get("statusCode");
+			
+			if(statusNode.getTextValue().equals("OK")){
+				WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
+				return wsResponse;				
+			}
+			else{
+				JavaType errorType = objectMapper.getTypeFactory().constructParametricType(WsResponse.class, WsError.class);
+				WsResponse<WsError> error = JsonHelper.fromJson(wsResponseJson, errorType);
+				throw new WsRestException(error.getResponseData());			
+			}
+		} catch (JsonParseException e) {
+			throw new BaseRuntimeException(null,e.getClass().getName());
+		} catch (IOException e) {
+			throw new BaseRuntimeException(null,e.getClass().getName());
 		}
 	}
 
