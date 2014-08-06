@@ -224,6 +224,11 @@ public class MorphiaDbManager {
 		Query<T> query = ds.find(clazz,queryField,regex);
 		return find(query);
 	}
+	public <T extends BaseMongoObject> List<T> findAndRetrieveFields(Class<T> clazz,String queryField,Pattern regex, ArrayList<String> fieldList){
+		log.debug("find for type "+clazz.getName()+" queryField " + queryField + " regex " + regex.pattern() + " with fields");
+		Query<T> query = ds.find(clazz,queryField,regex).retrievedFields(true, fieldList.toArray(new String[fieldList.size()]));
+		return find(query);
+	}
 	public <T extends BaseMongoObject> List<T> findAll(Class<T> clazz){
 		log.debug("findAll for type "+clazz.getName());
 		Query<T> query = ds.find(clazz);
