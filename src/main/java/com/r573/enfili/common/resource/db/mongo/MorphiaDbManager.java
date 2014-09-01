@@ -84,7 +84,15 @@ public class MorphiaDbManager {
 		setId(obj);
 		return obj;
 	}
-	
+
+	public <T extends BaseMongoObject>T update(T obj){
+		obj.setObjectId(new ObjectId(obj.getId()));
+		obj.setId(null);
+		ds.save(obj);
+		setId(obj);
+		return obj;
+	}
+
 	public <T extends BaseMongoObject>T get(Class<T> clazz,String id){
 		T obj = ds.getByKey(clazz, makeKey(clazz, id));
 		setId(obj);
