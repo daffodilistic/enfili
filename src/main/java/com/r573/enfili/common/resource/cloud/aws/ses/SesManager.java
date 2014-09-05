@@ -83,7 +83,7 @@ public class SesManager {
 		this.sender = sender;
 	}
 	
-	public void sendEmailToSingleRecipient(String recipient, String subject, String content){
+	public void sendEmailToSingleRecipient(String recipient, String subject, String emailContentText, String emailContentHtml){
 		SendEmailRequest request = new SendEmailRequest().withSource(sender);
 
 		List<String> toAddresses = new ArrayList<String>();
@@ -95,8 +95,16 @@ public class SesManager {
 		Message msg = new Message();
 		msg.setSubject(subjectContent);
 
-		Content textContent = new Content().withData(content);
-		Body body = new Body().withText(textContent);
+		Body body = new Body();
+		if(emailContentText!=null){
+			Content textContent = new Content().withData(emailContentText);
+			body.withText(textContent);
+		}
+		if(emailContentHtml!=null){
+			Content htmlContent = new Content().withData(emailContentHtml);
+			body.withHtml(htmlContent);
+		}
+		
 		msg.setBody(body);
 
 		request.setMessage(msg);
