@@ -17,9 +17,9 @@
  */
 package com.r573.enfili.common.resource.db.mongo;
 
-import com.r573.enfili.common.exception.BaseRuntimeException;
+import com.r573.enfili.common.exception.WsRuntimeException;
 
-public class MongoRuntimeException extends BaseRuntimeException {
+public class MongoRuntimeException extends WsRuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public MongoRuntimeException(String errCode, String errDesc) {

@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.r573.enfili.common.doc.json.JsonHelper;
-import com.r573.enfili.common.exception.BaseRuntimeException;
+import com.r573.enfili.common.exception.WsRuntimeException;
 import com.r573.enfili.common.text.StringHelper;
 import com.r573.enfili.ws.data.WsError;
 import com.r573.enfili.ws.data.WsResponse;
@@ -142,9 +142,9 @@ public class WsRestClient {
 				throw new WsRestException(error.getResponseData());			
 			}
 		} catch (JsonParseException e) {
-			throw new BaseRuntimeException(null,e.getClass().getName());
+			throw new WsRuntimeException(null,e.getClass().getName());
 		} catch (IOException e) {
-			throw new BaseRuntimeException(null,e.getClass().getName());
+			throw new WsRuntimeException(null,e.getClass().getName());
 		}
 	}
 
