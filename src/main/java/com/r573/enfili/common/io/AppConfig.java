@@ -67,10 +67,13 @@ public class AppConfig {
 	/**
 	 * Initializes AppConfig using the default config path "/config.properties"
 	 */
-	public static void init(){
+	public synchronized static void init(){
 		init(CONFIG_FILE_PATH);
 	}
-	public static void init(String configFilePath){
+	public synchronized static void init(String configFilePath){
+		if(instance != null){
+			throw new IllegalStateException("AppConfig already initialised");
+		}
 		instance = new AppConfig(configFilePath);
 	}
 }
