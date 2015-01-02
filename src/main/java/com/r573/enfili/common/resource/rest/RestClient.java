@@ -109,9 +109,14 @@ public class RestClient {
 		String wsResponseJson = response.getEntity(String.class);
 		log.debug(wsResponseJson);
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		ResponseWrapper<T> wsResponse = new ResponseWrapper(JsonHelper.fromJson(wsResponseJson, clazz));
-		return wsResponse;
+		try{
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			ResponseWrapper<T> wsResponse = new ResponseWrapper(JsonHelper.fromJson(wsResponseJson, clazz));
+			return wsResponse;			
+		}
+		catch(Exception e){
+			return null;
+		}
 	}
 
 }
