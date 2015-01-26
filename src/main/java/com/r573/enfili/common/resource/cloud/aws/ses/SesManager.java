@@ -35,10 +35,10 @@ public class SesManager {
 	private static SingletonManager<SesManager> singletonManager = new SingletonManager<SesManager>();
 	
 	private AmazonSimpleEmailServiceClient client;
-	private String sender;
+	private String defaultSender;
 		
-	public static void initFromEnv(String sender, String tag) {
-		initFromEnv(AwsConstants.DEFAULT_ENV_KEY_ACCESS_KEY, AwsConstants.DEFAULT_ENV_KEY_SECRET_KEY, sender, tag);
+	public static void initFromEnv(String defaultSender, String tag) {
+		initFromEnv(AwsConstants.DEFAULT_ENV_KEY_ACCESS_KEY, AwsConstants.DEFAULT_ENV_KEY_SECRET_KEY, defaultSender, tag);
 	}
 
 	public static void initFromEnv(String keyAccessKey, String keySecretKey, String sender, String tag) {
@@ -54,13 +54,13 @@ public class SesManager {
 		initWithCredentials(awsAccessKey, awsSecretKey, sender, tag);
 	}
 
-	public static void initWithCredentials(String awsAccessKey, String awsSecretKey, String sender, String tag) {
+	public static void initWithCredentials(String awsAccessKey, String awsSecretKey, String defaultSender, String tag) {
 		AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-		initWithCredentials(awsCredentials, sender, tag);
+		initWithCredentials(awsCredentials, defaultSender, tag);
 	}
 
-	public static void initWithCredentials(AWSCredentials awsCredentials, String sender, String tag) {
-		SesManager manager = new SesManager(awsCredentials, sender);
+	public static void initWithCredentials(AWSCredentials awsCredentials, String defaultSender, String tag) {
+		SesManager manager = new SesManager(awsCredentials, defaultSender);
 
 		singletonManager.addInstance(tag, manager);
 	}
@@ -77,13 +77,12 @@ public class SesManager {
 		singletonManager.removeInstance(tag);
 	}
 
-	private SesManager(AWSCredentials awsCredentials, String sender) {
+	private SesManager(AWSCredentials awsCredentials, String defaultSender) {
 		client = new AmazonSimpleEmailServiceClient(awsCredentials);
 
-		this.sender = sender;
+		this.defaultSender = defaultSender;
 	}
-	
-	public void sendEmailToSingleRecipient(String recipient, String subject, String emailContentText, String emailContentHtml){
+	public void sendEmailToSingleRecipient(String recipient, String subject, String emailContentText, String emailContentHtml, String sender){
 		SendEmailRequest request = new SendEmailRequest().withSource(sender);
 
 		List<String> toAddresses = new ArrayList<String>();
@@ -110,5 +109,8 @@ public class SesManager {
 		request.setMessage(msg);
 		
 		client.sendEmail(request);
+	}
+	public void sendEmailToSingleRecipient(String recipient, String subject, String emailContentText, String emailContentHtml){
+		sendEmailToSingleRecipient(recipient,subject,emailContentText,emailContentHtml,defaultSender);
 	}
 }
