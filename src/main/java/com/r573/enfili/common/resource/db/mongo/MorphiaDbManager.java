@@ -282,6 +282,9 @@ public class MorphiaDbManager {
 			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, result.getError());
 		}
 	}
+	public <T extends BaseMongoObject> int count(Query<T> query){
+		return (int)ds.getCount(query);
+	}
 	private <T extends BaseMongoObject> void setId(T obj){
 		obj.setId(obj.getObjectId().toString());
 	}
