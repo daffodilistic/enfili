@@ -95,7 +95,9 @@ public class MorphiaDbManager {
 
 	public <T extends BaseMongoObject>T get(Class<T> clazz,String id){
 		T obj = ds.getByKey(clazz, makeKey(clazz, id));
-		setId(obj);
+		if(obj!=null){
+			setId(obj);			
+		}
 		return obj;
 	}
 	
