@@ -24,11 +24,11 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.r573.enfili.common.doc.json.JsonHelper;
-import com.r573.enfili.common.text.StringHelper;
 import com.r573.enfili.ws.data.WsError;
 import com.r573.enfili.ws.data.WsResponse;
 
@@ -39,8 +39,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
 
 	@Override
 	public Response toResponse(Exception e) {
-		log.error("Exception " + e.getClass().getName() + " caught in GeneralExceptionMapper");
-		log.error(StringHelper.stackTraceToString(e));
+		log.error(ExceptionUtils.getStackTrace(e));
 		GenericEntity<String> entity = new GenericEntity<String>(JsonHelper.toJson(new WsResponse<WsError>(WsResponse.RESP_CODE_ERROR, new WsError(WsError.GENERAL_ERROR, "General Error")))) {
 		};
 		return Response.status(Status.OK).entity(entity).type(MediaType.APPLICATION_JSON).build();

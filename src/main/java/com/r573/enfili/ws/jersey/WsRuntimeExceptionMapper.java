@@ -22,7 +22,7 @@ public class WsRuntimeExceptionMapper implements ExceptionMapper<WsRuntimeExcept
 
 	@Override
 	public Response toResponse(WsRuntimeException e) {
-		log.warn(ExceptionUtils.getStackTrace(e));		
+		log.error(ExceptionUtils.getStackTrace(e));		
 		WsResponse<WsError> errorResp = new WsResponse<WsError>(WsResponse.RESP_CODE_ERROR, new WsError(e.getErrCode(), e.getErrDesc()));
 		String errorJson = JsonHelper.toJson(errorResp);
 		GenericEntity<String> respEntity = new GenericEntity<String>(errorJson) {};
