@@ -18,6 +18,7 @@
 
 package com.r573.enfili.common.doc.spreadsheet;
 
+import java.util.Date;
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -57,6 +58,9 @@ public class SpreadsheetHelper {
 		getCell(sheet, colId, rowId).setCellValue(value);
 	}
 	public static void setCellValue(Sheet sheet, int colId, int rowId, double value){
+		getCell(sheet, colId, rowId).setCellValue(value);
+	}
+	public static void setCellValue(Sheet sheet, int colId, int rowId, Date value){
 		getCell(sheet, colId, rowId).setCellValue(value);
 	}
 	
