@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Loads a config file from the classpath (e.g. file in src/main/resources compiled into the JAR under the Maven directly structure)
  * To load from the root of the classpath, remember to prepend paths with "/"
@@ -30,6 +33,8 @@ import java.util.Properties;
  *
  */
 public class AppConfig {
+	private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
+	
 	private static final String CONFIG_FILE_PATH = "/config.properties";
 
 	private static AppConfig instance;
@@ -71,9 +76,11 @@ public class AppConfig {
 		init(CONFIG_FILE_PATH);
 	}
 	public synchronized static void init(String configFilePath){
-		if(instance != null){
-			throw new IllegalStateException("AppConfig already initialised");
+		if (instance != null) {
+			//throw new IllegalStateException("AppConfig already initialised");
+			log.warn("AppConfig already initialised! Check your code!");
+		} else {
+			instance = new AppConfig(configFilePath);
 		}
-		instance = new AppConfig(configFilePath);
 	}
 }
