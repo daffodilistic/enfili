@@ -17,7 +17,6 @@
  */
 package com.r573.enfili.common.resource.db.mongo;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,16 +25,13 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -107,55 +103,36 @@ public class MorphiaDbManager {
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).set(fieldName, fieldData);
 		UpdateResults results = ds.update(makeKey(clazz, collection, id), ops);
 		log.debug("UpdatedCount " + results.getUpdatedCount());
-		//if(results.getHadError()){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
-		//}
 	}
 	
 	public <T extends BaseMongoObject> void deleteField(Class<T> clazz, String collection, String id, String fieldName) {
 		log.debug("deleteField " + fieldName + " for type "+clazz.getName()+" id "+id);
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).unset(fieldName);
 		UpdateResults results = ds.update(makeKey(clazz, collection, id), ops);
-		log.debug("UpdatedCount " + results.getUpdatedCount());
-		//if(results.getHadError()){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
-		//}		
+		log.debug("UpdatedCount (delete) " + results.getUpdatedCount());
 	}
 	
 	public <T extends BaseMongoObject> void addToArray(Class<T> clazz, String collection, String id, String fieldName, Object item) {
 		log.debug("addToArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with item " + item.toString());
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).add(fieldName, item);
 		UpdateResults results = ds.update(makeKey(clazz, collection, id), ops);
-		log.debug("UpdatedCount " + results.getUpdatedCount());
-		//if(results.getHadError()){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
-		//}
+		log.debug("UpdatedCount (add) " + results.getUpdatedCount());
 	}
 	public <T extends BaseMongoObject> void removeFromArray(Class<T> clazz, String collection, String id, String fieldName, Object item) {
 		log.debug("removeFromArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with item " + item.toString());
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, item);
 		UpdateResults results = ds.update(makeKey(clazz, collection, id), ops);
-		log.debug("UpdatedCount " + results.getUpdatedCount());
-		//if(results.getHadError()){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
-		//}
+		log.debug("UpdatedCount (removed) " + results.getUpdatedCount());
 	}
 	public <T extends BaseMongoObject> void replaceItemInArray(Class<T> clazz, String collection, String id, String fieldName, Object oldItem, Object newItem) {
 		log.debug("replaceItemInArray " + fieldName + " for type "+clazz.getName()+" id "+id+" with oldItem " + oldItem.toString() + " newItem " + newItem.toString());
 		UpdateOperations<T> ops = ds.createUpdateOperations(clazz).removeAll(fieldName, oldItem);
 		UpdateResults results = ds.update(makeKey(clazz, collection, id), ops);
-		log.debug("UpdatedCount " + results.getUpdatedCount());
-		//if(results.getHadError()){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results.getError());
-		//}
-		//else{
-			UpdateOperations<T> ops2 = ds.createUpdateOperations(clazz).add(fieldName, newItem);
-			UpdateResults results2 = ds.update(makeKey(clazz, collection, id), ops2);
-			log.debug("UpdatedCount2 " + results2.getUpdatedCount());
-			//if(results2.getHadError()){
-				//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, results2.getError());
-			//}
-		//}
+		log.debug("UpdatedCount (replaced) " + results.getUpdatedCount());
+
+		UpdateOperations<T> ops2 = ds.createUpdateOperations(clazz).add(fieldName, newItem);
+		UpdateResults results2 = ds.update(makeKey(clazz, collection, id), ops2);
+		log.debug("UpdatedCount2 (replaced) " + results2.getUpdatedCount());
 	}
 	
 	public <T extends BaseMongoObject,V extends BaseMongoObject> void mergeIntoArray(Class<T> clazz, String collection, String id, String fieldName, List<V> originalArray, List<V> mergeArray) {
@@ -280,10 +257,7 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> void findAndDelete(Class<T> clazz, String queryField, String queryValue) {
 		log.debug("findAndDelete for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
-		WriteResult result = ds.delete(query);
-		//if(result.getError() != null){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, result.getError());
-		//}
+		ds.delete(query);
 	}
 	public <T extends BaseMongoObject> int count(Query<T> query){
 		return (int)ds.getCount(query);

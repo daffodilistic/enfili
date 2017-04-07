@@ -17,7 +17,7 @@
  */
 package com.r573.enfili.common.resource.external.appstore;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class VerifyReceiptRequest {
 	

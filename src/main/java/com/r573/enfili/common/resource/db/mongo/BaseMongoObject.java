@@ -18,9 +18,10 @@
 package com.r573.enfili.common.resource.db.mongo;
 
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.mongodb.morphia.annotations.Id;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class BaseMongoObject {

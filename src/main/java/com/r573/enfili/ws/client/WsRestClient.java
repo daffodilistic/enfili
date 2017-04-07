@@ -33,15 +33,16 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.JavaType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.r573.enfili.common.doc.json.JsonHelper;
 import com.r573.enfili.common.exception.WsRuntimeException;
 import com.r573.enfili.common.text.StringHelper;
@@ -132,7 +133,7 @@ public class WsRestClient {
 			JsonNode node = objectMapper.readTree(jp);
 			JsonNode statusNode = node.get("statusCode");
 			
-			if(statusNode.getTextValue().equals("OK")){
+			if(statusNode.textValue().equals("OK")){
 				WsResponse<T> wsResponse = JsonHelper.fromJson(wsResponseJson, javaType);
 				return wsResponse;				
 			}

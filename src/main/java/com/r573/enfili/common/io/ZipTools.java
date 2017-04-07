@@ -34,7 +34,6 @@ import com.r573.enfili.common.io.file.FileHelper;
 
 public class ZipTools {
 	private static final int BUFFER_SIZE = 1024;
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(ZipTools.class);
 
 	public static void makeZip(File sourceDir, File targetFile, String pathPrefix) {

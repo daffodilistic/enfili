@@ -17,7 +17,7 @@
  */
 package com.r573.enfili.ws.data;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 // Notes: javax.ws.rs.core.Response, ClientResponse has status.
 @JsonIgnoreProperties(ignoreUnknown = true)
