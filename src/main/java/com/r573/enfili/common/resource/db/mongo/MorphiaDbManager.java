@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -276,7 +277,10 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> void findAndDelete(Class<T> clazz, String queryField, String queryValue) {
 		log.debug("findAndDelete for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
-		ds.delete(query);
+		WriteResult result = ds.delete(query);
+		if (!result.wasAcknowledged()) {
+			throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, "Error, write was not acknowleged for delete query: " + query.toString());
+		}
 	}
 	public <T extends BaseMongoObject> int count(Query<T> query){
 		return (int)ds.getCount(query);
