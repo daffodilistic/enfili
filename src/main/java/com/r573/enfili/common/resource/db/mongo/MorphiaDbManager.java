@@ -17,7 +17,6 @@
  */
 package com.r573.enfili.common.resource.db.mongo;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,16 +25,13 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
 
 public class MorphiaDbManager {
 	private static Logger log = LoggerFactory.getLogger(MorphiaDbManager.class);
@@ -280,10 +276,7 @@ public class MorphiaDbManager {
 	public <T extends BaseMongoObject> void findAndDelete(Class<T> clazz, String queryField, String queryValue) {
 		log.debug("findAndDelete for type "+clazz.getName()+" queryField " + queryField + " searchTerm " + queryValue);
 		Query<T> query = ds.find(clazz,queryField,queryValue);
-		WriteResult result = ds.delete(query);
-		//if(result.getError() != null){
-			//throw new MongoRuntimeException(ERR_DB_WRITE_FAILURE, result.getError());
-		//}
+		ds.delete(query);
 	}
 	public <T extends BaseMongoObject> int count(Query<T> query){
 		return (int)ds.getCount(query);
